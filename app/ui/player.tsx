@@ -9,17 +9,25 @@ import {
 import * as React from "react";
 import { useDisplayCoverage } from "../lib/use-display-coverage";
 import { useFaceLandmarks, CameraDebugPanel } from "../lib/use-face-landmarks";
+import { useRandomVolume } from "../lib/use-random-volume";
 
 const Video = () => {
   // "Wire up" the <video/> element to the MediaStore using useMediaRef()
   const mediaRef = useMediaRef();
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+
+  // Set up random volume control
+  useRandomVolume(videoRef);
+
   return (
     <video
-      ref={mediaRef}
+      ref={(el) => {
+        videoRef.current = el;
+        mediaRef(el);
+      }}
       style={{ width: "100%" }}
       src="https://stream.mux.com/DS00Spx1CV902MCtPj5WknGlR102V5HFkDe/high.mp4"
       preload="auto"
-      muted
       crossOrigin=""
     />
   );
