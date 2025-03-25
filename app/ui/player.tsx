@@ -16,7 +16,7 @@ const Video = () => {
   return (
     <video
       ref={mediaRef}
-      style={{ width: "100vw" }}
+      style={{ width: "100%" }}
       src="https://stream.mux.com/DS00Spx1CV902MCtPj5WknGlR102V5HFkDe/high.mp4"
       preload="auto"
       muted
