@@ -72,7 +72,7 @@ export function useRandomVolume(
 
     // Start new interval
     intervalRef.current = window.setInterval(() => {
-      if (isPointerDownOnSlider) {
+      if (isPointerDownOnSlider || video.paused) {
         return;
       }
 
