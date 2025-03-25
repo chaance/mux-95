@@ -57,7 +57,7 @@ const FullscreenButton = () => {
   const dispatch = useMediaDispatch();
   // Get the latest media state you care about in your component using useMediaSelector()
   const mediaIsFullscreen = useMediaSelector(
-    (state) => state.mediaIsFullscreen
+    (state) => state.mediaIsFullscreen,
   );
   return (
     <button
@@ -102,6 +102,21 @@ const VolumeSlider = () => {
         className="w-32"
       />
       <span className="text-sm">{Math.round((muted ? 0 : volume) * 100)}%</span>
+      <button
+        onClick={() => {
+          const randomVolume = Math.random();
+          dispatch({
+            type: MediaActionTypes.MEDIA_VOLUME_REQUEST,
+            detail: randomVolume,
+          });
+          if (muted) {
+            dispatch({ type: MediaActionTypes.MEDIA_UNMUTE_REQUEST });
+          }
+        }}
+        className="px-2 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+      >
+        Random
+      </button>
     </div>
   );
 };
@@ -113,7 +128,7 @@ const PlaybackRateController = ({
 }) => {
   const dispatch = useMediaDispatch();
   const currentPlaybackRate = useMediaSelector(
-    (state) => state.mediaPlaybackRate
+    (state) => state.mediaPlaybackRate,
   );
 
   React.useEffect(() => {
