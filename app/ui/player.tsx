@@ -99,6 +99,37 @@ const PlaybackSpeedSlider = () => {
   );
 };
 
+const VolumeSlider = () => {
+  const dispatch = useMediaDispatch();
+  const volume = useMediaSelector((state) => state.mediaVolume) ?? 1;
+  const muted = useMediaSelector((state) => state.mediaMuted);
+  
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-sm">Volume:</span>
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.1"
+        value={muted ? 0 : volume}
+        onChange={(e) => {
+          const newVolume = parseFloat(e.target.value);
+          dispatch({ 
+            type: MediaActionTypes.MEDIA_VOLUME_REQUEST,
+            detail: newVolume
+          });
+          if (muted && newVolume > 0) {
+            dispatch({ type: MediaActionTypes.MEDIA_UNMUTE_REQUEST });
+          }
+        }}
+        className="w-32"
+      />
+      <span className="text-sm">{Math.round((muted ? 0 : volume) * 100)}%</span>
+    </div>
+  );
+};
+
 export const Player = () => {
   // Get access to Media Chrome's state management in your components using <MediaProvider/>
   // NOTE: Unlike many other providers (including react-redux's Provider), you'll likely want to keep
@@ -111,6 +142,7 @@ export const Player = () => {
           <PlayButton />
           <FullscreenButton />
           <PlaybackSpeedSlider />
+          <VolumeSlider />
         </div>
       </PlayerContainer>
     </MediaProvider>
