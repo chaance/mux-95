@@ -6,35 +6,24 @@ import {
   useMediaFullscreenRef,
   MediaActionTypes,
 } from "media-chrome/react/media-store";
-import * as React from "react";
-import { useDisplayCoverage } from "../lib/use-display-coverage";
-import { useFaceLandmarks, CameraDebugPanel } from "../lib/use-face-landmarks";
-import { useRandomVolume } from "../lib/use-random-volume";
+import { CameraDebugPanel, useFaceLandmarks } from "~/lib/use-face-landmarks";
+import React from "react";
 
 const Video = () => {
-  // "Wire up" the <video/> element to the MediaStore using useMediaRef()
   const mediaRef = useMediaRef();
-  const videoRef = React.useRef<HTMLVideoElement>(null);
-
-  // Set up random volume control
-  useRandomVolume(videoRef);
-
   return (
     <video
-      ref={(el) => {
-        videoRef.current = el;
-        mediaRef(el);
-      }}
-      style={{ width: "100%" }}
+      ref={mediaRef}
+      style={{ width: "100vw" }}
       src="https://stream.mux.com/DS00Spx1CV902MCtPj5WknGlR102V5HFkDe/high.mp4"
       preload="auto"
+      muted
       crossOrigin=""
     />
   );
 };
 
-const PlayerContainer = ({ children }) => {
-  // "Wire up" the element you want the MediaStore to target for fullscreen using useMediaFullscreenRef()
+const PlayerContainer = ({ children }: { children: React.ReactNode }) => {
   const mediaFullscreenRef = useMediaFullscreenRef();
   return <div ref={mediaFullscreenRef}>{children}</div>;
 };
@@ -83,6 +72,33 @@ const FullscreenButton = () => {
   );
 };
 
+const PlaybackSpeedSlider = () => {
+  const dispatch = useMediaDispatch();
+  const playbackRate = useMediaSelector((state) => state.mediaPlaybackRate);
+
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-sm">Speed:</span>
+      <input
+        type="range"
+        min="0.25"
+        max="2"
+        step="0.25"
+        value={playbackRate}
+        onChange={(e) => {
+          const newRate = parseFloat(e.target.value);
+          dispatch({
+            type: MediaActionTypes.MEDIA_PLAYBACK_RATE_REQUEST,
+            detail: newRate,
+          });
+        }}
+        className="w-32"
+      />
+      <span className="text-sm">{playbackRate}x</span>
+    </div>
+  );
+};
+
 const VolumeSlider = () => {
   const dispatch = useMediaDispatch();
   const volume = useMediaSelector((state) => state.mediaVolume) ?? 1;
@@ -110,56 +126,24 @@ const VolumeSlider = () => {
         className="w-32"
       />
       <span className="text-sm">{Math.round((muted ? 0 : volume) * 100)}%</span>
-      <button
-        onClick={() => {
-          const randomVolume = Math.random();
-          dispatch({
-            type: MediaActionTypes.MEDIA_VOLUME_REQUEST,
-            detail: randomVolume,
-          });
-          if (muted) {
-            dispatch({ type: MediaActionTypes.MEDIA_UNMUTE_REQUEST });
-          }
-        }}
-        className="px-2 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300 transition-colors"
-      >
-        Random
-      </button>
     </div>
   );
 };
 
-const PlaybackRateController = ({
-  displayCoverage,
-}: {
-  displayCoverage: number;
-}) => {
-  const dispatch = useMediaDispatch();
-  const currentPlaybackRate = useMediaSelector(
-    (state) => state.mediaPlaybackRate,
-  );
-
-  React.useEffect(() => {
-    // Debounce the playback rate updates
-    const timeoutId = setTimeout(() => {
-      // Clamp the playback rate between 0.5x and 2x
-      const playbackRate = Math.min(Math.max(displayCoverage, 0.5), 2);
-
-      dispatch({
-        type: MediaActionTypes.MEDIA_PLAYBACK_RATE_REQUEST,
-        detail: playbackRate,
-      });
-    }, 100); // 100ms debounce
-
-    return () => clearTimeout(timeoutId);
-  }, [displayCoverage, dispatch, currentPlaybackRate]);
-
-  return null;
-};
-
 export const Player = () => {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const displayCoverage = useDisplayCoverage(containerRef) / 100;
+  // const {
+  //   videoRef,
+  //   attentiveness,
+  //   isWatching,
+  //   cameraStatus,
+  //   lastError,
+  //   permissionStatus,
+  //   faceDetectionStatus,
+  //   lastDetectionTime,
+  //   eyeStatus,
+  // } = useAttentionPlayback();
+
+  // use use-face-landmarks
   const {
     isWatching,
     cameraStatus,
@@ -175,28 +159,24 @@ export const Player = () => {
   return (
     <MediaProvider>
       <PlayerContainer>
-        <div ref={containerRef}>
-          <Video />
-        </div>
+        <Video />
         <div>
           <PlayButton />
           <FullscreenButton />
+          <PlaybackSpeedSlider />
           <VolumeSlider />
         </div>
-        <div>
-          <CameraDebugPanel
-            isWatching={isWatching}
-            cameraStatus={cameraStatus}
-            lastError={lastError}
-            permissionStatus={permissionStatus}
-            faceDetectionStatus={faceDetectionStatus}
-            lastDetectionTime={lastDetectionTime}
-            eyeStatus={eyeStatus}
-            attentiveness={attentiveness}
-            videoRef={videoRef as React.RefObject<HTMLVideoElement>}
-          />
-        </div>
-        <PlaybackRateController displayCoverage={displayCoverage} />
+        <CameraDebugPanel
+          isWatching={isWatching}
+          cameraStatus={cameraStatus}
+          lastError={lastError}
+          permissionStatus={permissionStatus}
+          faceDetectionStatus={faceDetectionStatus}
+          lastDetectionTime={lastDetectionTime}
+          eyeStatus={eyeStatus}
+          attentiveness={attentiveness}
+          videoRef={videoRef}
+        />
       </PlayerContainer>
     </MediaProvider>
   );
