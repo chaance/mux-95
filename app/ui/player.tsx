@@ -8,6 +8,7 @@ import {
 } from "media-chrome/react/media-store";
 import * as React from "react";
 import { useDisplayCoverage } from "../lib/use-display-coverage";
+import { useFaceLandmarks, CameraDebugPanel } from "../lib/use-face-landmarks";
 
 const Video = () => {
   // "Wire up" the <video/> element to the MediaStore using useMediaRef()
@@ -105,16 +106,22 @@ const VolumeSlider = () => {
   );
 };
 
-const PlaybackRateController = ({ displayCoverage }: { displayCoverage: number }) => {
+const PlaybackRateController = ({
+  displayCoverage,
+}: {
+  displayCoverage: number;
+}) => {
   const dispatch = useMediaDispatch();
-  const currentPlaybackRate = useMediaSelector((state) => state.mediaPlaybackRate);
+  const currentPlaybackRate = useMediaSelector(
+    (state) => state.mediaPlaybackRate
+  );
 
   React.useEffect(() => {
     // Debounce the playback rate updates
     const timeoutId = setTimeout(() => {
       // Clamp the playback rate between 0.5x and 2x
       const playbackRate = Math.min(Math.max(displayCoverage, 0.5), 2);
-      
+
       dispatch({
         type: MediaActionTypes.MEDIA_PLAYBACK_RATE_REQUEST,
         detail: playbackRate,
@@ -130,6 +137,17 @@ const PlaybackRateController = ({ displayCoverage }: { displayCoverage: number }
 export const Player = () => {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const displayCoverage = useDisplayCoverage(containerRef) / 100;
+  const {
+    isWatching,
+    cameraStatus,
+    lastError,
+    permissionStatus,
+    faceDetectionStatus,
+    lastDetectionTime,
+    eyeStatus,
+    attentiveness,
+    videoRef,
+  } = useFaceLandmarks();
 
   return (
     <MediaProvider>
@@ -141,6 +159,19 @@ export const Player = () => {
           <PlayButton />
           <FullscreenButton />
           <VolumeSlider />
+        </div>
+        <div>
+          <CameraDebugPanel
+            isWatching={isWatching}
+            cameraStatus={cameraStatus}
+            lastError={lastError}
+            permissionStatus={permissionStatus}
+            faceDetectionStatus={faceDetectionStatus}
+            lastDetectionTime={lastDetectionTime}
+            eyeStatus={eyeStatus}
+            attentiveness={attentiveness}
+            videoRef={videoRef as React.RefObject<HTMLVideoElement>}
+          />
         </div>
         <PlaybackRateController displayCoverage={displayCoverage} />
       </PlayerContainer>
