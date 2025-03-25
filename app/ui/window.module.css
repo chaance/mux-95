@@ -5,6 +5,14 @@
   padding: 2px;
   display: grid;
   grid-template: "titlebar" 32px "content" 1fr / 1fr;
+  overflow: auto;
+  width: var(--window-width);
+  height: var(--window-height);
+  min-height: 32px;
+
+  &:where([data-resizable]) {
+    resize: both;
+  }
 }
 
 .titleBar {
@@ -16,10 +24,13 @@
   padding: 4px;
   background-color: var(--color-blue-9);
   color: var(--color-white);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .title {
   margin-left: 4px;
+  flex: 1 1 100%;
 }
 
 .content {

@@ -11,7 +11,7 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Home() {
   return (
-    <Window title="Media Player">
+    <Window title="Media Player" resizable>
       <Player />
     </Window>
   );
