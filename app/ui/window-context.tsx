@@ -3,7 +3,7 @@ import * as React from "react";
 type WindowContextValue = {
   windows: string[];
   focused: string | null;
-  openWindow: (id: string) => void;
+  openWindow: (id: string, context?: any) => void;
   closeWindow: (id: string) => void;
   focus: (id: string) => void;
   blur: () => void;

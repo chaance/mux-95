@@ -1,7 +1,7 @@
 .Button {
   --_border-size: var(--border-2);
   appearance: none;
-  padding: var(--spacing-1) var(--spacing-0);
+  padding: var(--spacing-1) var(--spacing-3);
   display: inline-flex;
   align-items: center;
   justify-content: center;

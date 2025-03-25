@@ -7,7 +7,7 @@ export function WindowProvider({ children }: { children: React.ReactNode }) {
     windows: [] as string[],
     focused: null as string | null,
   });
-  const openWindow = React.useCallback((id: string) => {
+  const openWindow = React.useCallback((id: string, context?: any) => {
     setWindowState((state) => {
       if (state.windows.includes(id)) {
         return state;

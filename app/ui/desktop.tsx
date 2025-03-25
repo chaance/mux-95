@@ -21,7 +21,7 @@ export function Desktop({ children }: { children: React.ReactNode }) {
             icon="/icons/folder.png"
             label="Videos"
             // TODO
-            onClick={() => void 0}
+            onClick={() => openWindow("videos")}
           />
           <DesktopItem
             icon="/icons/media-player.png"

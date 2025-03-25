@@ -1,4 +1,5 @@
 import {
+  data,
   isRouteErrorResponse,
   Links,
   Meta,
@@ -11,6 +12,7 @@ import type { Route } from "./+types/root";
 import "./root.css";
 import { Desktop } from "./ui/desktop";
 import { WindowProvider } from "./ui/window-provider";
+import { mux } from "~/lib/mux.server";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -24,6 +26,36 @@ export const links: Route.LinksFunction = () => [
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
 ];
+
+export const loader = async ({}: Route.LoaderArgs) => {
+  const CORS_ORIGIN = process.env.CORS_ORIGIN;
+  if (!CORS_ORIGIN) {
+    console.error("CORS_ORIGIN is required");
+    throw Response.json("Server error", {
+      status: 500,
+    });
+  }
+
+  // Create an endpoint for MuxUploader to upload to
+  const [upload, videos] = await Promise.all([
+    mux.video.uploads.create({
+      new_asset_settings: {
+        playback_policy: ["public"],
+        video_quality: "basic",
+      },
+      // in production, you'll want to change this origin to your-domain.com
+      cors_origin: CORS_ORIGIN,
+    }),
+    mux.video.assets.list(),
+  ]);
+  console.log(videos.data);
+  return data(
+    {
+      mux: { id: upload.id, url: upload.url, videos: Array.from(videos.data) },
+    },
+    { status: 200 }
+  );
+};
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
