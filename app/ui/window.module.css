@@ -8,7 +8,8 @@
   overflow: auto;
   width: var(--window-width);
   height: var(--window-height);
-  min-height: 32px;
+  min-height: 80px;
+  max-width: 100vw;
 
   &:where([data-resizable]) {
     resize: both;
