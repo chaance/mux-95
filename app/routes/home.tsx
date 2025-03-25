@@ -1,4 +1,5 @@
 import type { Route } from "./+types/home";
+import { Player } from "../ui/player";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -8,5 +9,5 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  return <h1>hey Chan</h1>;
+  return <h1><Player /></h1>;
 }
