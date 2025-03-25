@@ -3,11 +3,11 @@ import { Player } from "../ui/player";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    //
+    { title: "Mux 95" },
   ];
 }
 
 export default function Home() {
-  return <h1><Player /></h1>;
+  return <Player />;
 }
