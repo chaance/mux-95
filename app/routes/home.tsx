@@ -1,5 +1,6 @@
 import type { Route } from "./+types/home";
 import { Player } from "../ui/player";
+import { Window } from "../ui/window";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,5 +10,9 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  return <Player />;
+  return (
+    <Window title="Media Player">
+      <Player />
+    </Window>
+  );
 }

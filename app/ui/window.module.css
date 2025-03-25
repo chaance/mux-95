@@ -1,0 +1,47 @@
+.Window {
+  background-color: var(--color-gray-8);
+  border: 2px solid;
+  border-color: var(--color-white) var(--color-gray-6) var(--color-gray-6);
+  padding: 2px;
+  display: grid;
+  grid-template: "titlebar" 32px "content" 1fr / 1fr;
+}
+
+.titleBar {
+  grid-area: titlebar;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px;
+  background-color: var(--color-blue-9);
+  color: var(--color-white);
+}
+
+.title {
+  margin-left: 4px;
+}
+
+.content {
+  grid-area: content;
+}
+
+.controls {
+  display: flex;
+  gap: 4px;
+}
+
+.controlButton {
+  flex: 0 0 auto;
+  height: 26px;
+  width: 26px;
+  background-color: var(--color-gray-8);
+  border: 2px solid;
+  border-color: var(--color-white) var(--color-gray-6) var(--color-gray-6);
+  padding: 4px;
+  color: var(--color-black);
+}
+
+.controlButton :global(svg) {
+  fill: currentColor;
+}
