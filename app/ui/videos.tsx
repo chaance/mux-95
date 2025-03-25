@@ -64,9 +64,6 @@ function VideosImpl({ onVideoSelect }: VideosProps) {
       {/* progress */}
       <MuxUploaderProgress type="percentage" muxUploader={MUX_UPLOADER_ID} />
 
-      {/* Address bar */}
-      <div>C:\Videos</div>
-
       {/* File explorer */}
       <MuxUploaderDrop
         muxUploader={MUX_UPLOADER_ID}
