@@ -4,8 +4,10 @@ import * as React from "react";
 import { DesktopItem } from "./desktop-item";
 import { StartMenu } from "./start-menu";
 import styles from "./desktop.module.css";
+import { useWindowState } from "./use-window-state";
 
 export function Desktop({ children }: { children: React.ReactNode }) {
+  const { openWindow } = useWindowState();
   return (
     <div className={styles.Desktop}>
       <div className={styles.main}>
@@ -25,7 +27,7 @@ export function Desktop({ children }: { children: React.ReactNode }) {
             icon="/icons/media-player.png"
             label="Media Player"
             // TODO
-            onClick={() => void 0}
+            onClick={() => openWindow("media-player")}
           />
         </div>
         {children}
