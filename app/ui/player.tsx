@@ -224,6 +224,32 @@ const PlaybackRateController = ({
   return null;
 };
 
+const AttentivenessController = ({
+  attentiveness,
+}: {
+  attentiveness: number;
+}) => {
+  const dispatch = useMediaDispatch();
+  const mediaPaused = useMediaSelector((state) => state.mediaPaused);
+
+  React.useEffect(() => {
+    // Only play when attentiveness is exactly 100
+    const shouldPlay = attentiveness === 100;
+
+    if (shouldPlay && mediaPaused) {
+      dispatch({ type: MediaActionTypes.MEDIA_PLAY_REQUEST });
+    } else if (!shouldPlay && !mediaPaused) {
+      dispatch({ type: MediaActionTypes.MEDIA_PAUSE_REQUEST });
+    }
+  }, [attentiveness, mediaPaused, dispatch]);
+
+  return (
+    <div className="text-sm text-gray-600">
+      Attention Score: {attentiveness}% {attentiveness === 100 ? "✅" : "❌"}
+    </div>
+  );
+};
+
 export const Player = () => {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const sliderRef = React.useRef<HTMLInputElement | null>(null);
@@ -259,9 +285,10 @@ export const Player = () => {
             <FullscreenButton />
           </div>
           <VolumeSlider ref={sliderRef} />
+          <AttentivenessController attentiveness={attentiveness} />
         </div>
         <div>
-          {/* <CameraDebugPanel
+          <CameraDebugPanel
             isWatching={isWatching}
             cameraStatus={cameraStatus}
             lastError={lastError}
@@ -271,7 +298,7 @@ export const Player = () => {
             eyeStatus={eyeStatus}
             attentiveness={attentiveness}
             videoRef={videoRef as React.RefObject<HTMLVideoElement>}
-          /> */}
+          />
         </div>
       </PlayerContainer>
     </MediaProvider>
