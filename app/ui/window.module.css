@@ -1,10 +1,10 @@
 .Window {
-  background-color: var(--color-gray-8);
-  border: 2px solid;
-  border-color: var(--color-white) var(--color-gray-6) var(--color-gray-6);
-  padding: 2px;
-  display: grid;
-  grid-template: "titlebar" 32px "content" 1fr / 1fr;
+  /* background-color: var(--color-gray-8); */
+  /* border: 2px solid; */
+  /* border-color: var(--color-white) var(--color-gray-6) var(--color-gray-6); */
+  /* padding: 2px; */
+  /* display: grid; */
+  /* grid-template: "titlebar" 32px "content" 1fr / 1fr; */
   overflow: auto;
   width: var(--window-width);
   height: var(--window-height);
@@ -60,4 +60,75 @@
 
 .controlButton :global(svg) {
   fill: currentColor;
+}
+
+/** **/
+
+.WindowsBox {
+  --border-size: var(--border-2);
+  border: var(--border-size) solid var(--color-gray-10);
+  border-top-color: var(--color-gray-5);
+  border-left-color: var(--color-gray-5);
+  background: var(--color-gray-7);
+
+  &:where([data-inset]) {
+    border-color: var(--color-gray-5);
+    border-top-color: var(--color-gray-10);
+    border-left-color: var(--color-gray-10);
+  }
+
+  &:where([data-depth="2"]) {
+    --border-size: var(--border-2);
+  }
+
+  &:where([data-depth="3"]) {
+    --border-size: var(--border-3);
+  }
+
+  &:where([data-depth="4"]) {
+    --border-size: var(--border-4);
+  }
+}
+
+.WindowsWindow {
+  padding: var(--border-2);
+}
+
+.WindowsWindowBody {
+  padding: var(--spacing-3);
+  padding-top: var(--spacing-5);
+}
+
+.WindowsWindowHeader {
+  --button-size: 24px;
+  --p: var(--spacing-1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-2);
+  flex: 0 1 100%;
+  background: var(--color-blue-9);
+  padding: var(--p);
+  padding-left: calc(var(--p) * 2);
+  height: calc(var(--button-size) + var(--p) * 2);
+  line-height: 1;
+  color: var(--color-white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
+  user-select: none;
+}
+
+.WindowsHeaderButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--button-size);
+  height: var(--button-size);
+  padding: 0;
+
+  @nest :where(& > *) {
+    width: calc(var(--button-size) - var(--border-size) * 2);
+  }
 }

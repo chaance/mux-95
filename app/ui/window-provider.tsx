@@ -29,8 +29,35 @@ export function WindowProvider({ children }: { children: React.ReactNode }) {
       };
     });
   }, []);
+  const focus = React.useCallback((id: string) => {
+    setWindowState((state) => {
+      if (!state.windows.includes(id) || state.focused === id) {
+        return state;
+      }
+
+      // move the window to the end of the array
+      return {
+        windows: state.windows.filter((w) => w !== id).concat(id),
+        focused: id,
+      };
+    });
+  }, []);
+  const blur = React.useCallback(() => {
+    setWindowState((state) => {
+      if (state.focused === null) {
+        return state;
+      }
+
+      return {
+        windows: state.windows,
+        focused: null,
+      };
+    });
+  }, []);
   return (
-    <WindowContext value={{ windows, focused, openWindow, closeWindow }}>
+    <WindowContext
+      value={{ windows, focused, openWindow, closeWindow, blur, focus }}
+    >
       {children}
     </WindowContext>
   );

@@ -1,0 +1,21 @@
+.Button {
+  --_border-size: var(--border-2);
+  appearance: none;
+  padding: var(--spacing-1) var(--spacing-0);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--color-black);
+  border: var(--border-size) solid var(--color-gray-5);
+  border-bottom-color: var(--color-gray-9);
+  border-right-color: var(--color-gray-9);
+  background: var(--color-gray-7);
+
+  &:where(:active:not([data-meta-pressed])) {
+    background-color: var(--color-gray-8);
+    border-color: var(--color-gray-5);
+    border-top-color: var(--color-gray-9);
+    border-left-color: var(--color-gray-9);
+  }
+}

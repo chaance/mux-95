@@ -3,6 +3,96 @@ import * as React from "react";
 import styles from "./window.module.css";
 import { useDraggable } from "~/lib/use-draggable";
 import { useWindowState } from "./use-window-state";
+import cx from "clsx";
+import { Button, type ButtonProps } from "./button";
+
+const WindowsBox: React.FC<WindowsBoxProps> = (props) => {
+  let { children, className, inset, depth = 2, ...domProps } = props;
+  return (
+    <div
+      data-inset={inset ? "" : undefined}
+      className={cx(className, styles.WindowsBox)}
+      data-depth={depth}
+      {...domProps}
+    >
+      {children}
+    </div>
+  );
+};
+
+interface WindowsBoxProps extends React.ComponentPropsWithRef<"div"> {
+  inset?: boolean;
+  depth?: 2 | 3 | 4;
+}
+
+interface WindowsWindowProps extends React.ComponentPropsWithRef<"div"> {}
+
+const WindowsWindow: React.FC<WindowsWindowHeaderProps> = ({
+  children,
+  className,
+  ...props
+}) => {
+  return (
+    <WindowsBox
+      className={cx(styles.WindowsWindow, className)}
+      {...props}
+      inset={false}
+    >
+      {children}
+    </WindowsBox>
+  );
+};
+
+interface WindowsWindowHeaderProps extends React.ComponentPropsWithRef<"div"> {}
+
+const WindowsWindowHeader: React.FC<WindowsWindowHeaderProps> = ({
+  children,
+  className,
+  ...props
+}) => {
+  return (
+    <div className={cx(styles.WindowsWindowHeader, className)} {...props}>
+      {children}
+    </div>
+  );
+};
+
+interface WindowsWindowBodyProps extends React.ComponentPropsWithRef<"div"> {}
+
+const WindowsWindowBody: React.FC<WindowsWindowBodyProps> = ({
+  children,
+  className,
+  ...props
+}) => {
+  return (
+    <div className={cx(styles.WindowsWindowBody, className)} {...props}>
+      {children}
+    </div>
+  );
+};
+
+interface WindowsHeaderButtonProps extends ButtonProps {
+  icon: React.ReactNode;
+  label: string;
+}
+
+const WindowsHeaderButton: React.FC<WindowsHeaderButtonProps> = ({
+  className,
+  icon,
+  label,
+  ...props
+}) => {
+  return (
+    <Button
+      type="button"
+      className={cx(styles.WindowsHeaderButton, className)}
+      aria-label={label}
+      {...props}
+    >
+      <IconWindowsClose color="currentColor" />
+    </Button>
+  );
+};
 
 export function Window({
   title,
@@ -37,12 +127,12 @@ export function Window({
       return;
     }
   }, []);
-  const { windows, closeWindow } = useWindowState();
+  const { windows, closeWindow, focus } = useWindowState();
   const isOpen = windows.includes(windowId);
   const index = windows.indexOf(windowId);
   const zIndex = windows.length - index;
   return (
-    <div
+    <WindowsWindow
       style={{
         // @ts-expect-error
         "--window-height": `${size.height}px`,
@@ -50,29 +140,31 @@ export function Window({
         position: "absolute",
         left: `${position.x}px`,
         top: `${position.y}px`,
-        width: "320px",
         zIndex,
       }}
-      className={`${styles.Window} height-${size.height} width-${size.width}`}
-      data-height={size.height}
-      data-width={size.width}
+      className={styles.Window}
       data-resizable={resizable || undefined}
       data-state={isOpen ? "open" : "closed"}
     >
-      <div className={styles.titleBar} onMouseDown={handleMouseDown}>
-        <h2 className={styles.title}>{title}</h2>
-        <div className={styles.controls}>
-          <ControlButton label="Minimize" icon={null} onClick={() => void 0} />
-          <ControlButton label="Maximize" icon={null} onClick={() => void 0} />
-          <ControlButton
-            label="Close"
-            icon={null}
-            onClick={() => closeWindow(windowId)}
-          />
-        </div>
-      </div>
-      <div className={styles.content}>{children}</div>
-    </div>
+      <WindowsWindowHeader
+        className={styles.titleBar}
+        onMouseDown={(event) => {
+          focus(windowId);
+          handleMouseDown(event);
+        }}
+      >
+        <h2>{title}</h2>
+        <WindowsHeaderButton
+          label="Close window"
+          icon={null}
+          onClick={() => closeWindow(windowId)}
+        />
+      </WindowsWindowHeader>
+
+      <WindowsWindowBody>
+        <div>{children}</div>
+      </WindowsWindowBody>
+    </WindowsWindow>
   );
 }
 
@@ -96,3 +188,21 @@ function ControlButton({
     </button>
   );
 }
+
+interface IconProps extends React.ComponentPropsWithRef<"svg"> {
+  color: string;
+}
+
+const IconWindowsClose: React.FC<IconProps> = ({ color, ...props }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" {...props}>
+      <path
+        fill="none"
+        stroke={color}
+        strokeMiterlimit="10"
+        strokeWidth="3"
+        d="M11.692 11.692L28.308 28.308M28.308 11.692L11.692 28.308"
+      />
+    </svg>
+  );
+};
