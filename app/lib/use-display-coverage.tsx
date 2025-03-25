@@ -1,6 +1,8 @@
 import * as React from "react";
 
-export function useDisplayCoverage(playerRef: React.RefObject<HTMLDivElement | null>) {
+export function useDisplayCoverage(
+  playerRef: React.RefObject<HTMLDivElement | null>
+) {
   const [size, setSize] = React.useState(0);
 
   React.useEffect(() => {
@@ -23,7 +25,7 @@ export function useDisplayCoverage(playerRef: React.RefObject<HTMLDivElement | n
         screenWidthPercentage,
         screenHeightPercentage
       );
-      
+
       setSize(Math.round(screenPercentage));
     };
 
