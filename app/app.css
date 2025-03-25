@@ -82,11 +82,3 @@
   --color-gray-a11: #0000009b;
   --color-gray-a12: #000000df;
 }
-
-html,
-body {
-  color-scheme: light dark;
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }
-}
