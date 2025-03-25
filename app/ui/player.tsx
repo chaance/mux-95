@@ -7,7 +7,6 @@ import {
   MediaActionTypes,
 } from "media-chrome/react/media-store";
 import * as React from "react";
-import { useDisplayCoverage } from "../lib/use-display-coverage";
 import { useFaceLandmarks, CameraDebugPanel } from "../lib/use-face-landmarks";
 import { useRandomVolume } from "../lib/use-random-volume";
 
@@ -15,25 +14,56 @@ const Video = () => {
   // "Wire up" the <video/> element to the MediaStore using useMediaRef()
   const mediaRef = useMediaRef();
   const videoRef = React.useRef<HTMLVideoElement>(null);
+  const dispatch = useMediaDispatch();
 
   // Set up random volume control
   useRandomVolume(videoRef);
 
+  React.useEffect(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement) {
+      return;
+    }
+
+    const updatePlaybackRate = () => {
+      // get width of video element
+      const width = videoElement.clientWidth;
+      // get percentage of video element width to the screen width
+      const displayCoverage = width / window.innerWidth;
+      const playbackRate = Math.min(Math.max(displayCoverage, 0.5), 2);
+      // Dispatch a playback rate change request
+      dispatch({
+        type: MediaActionTypes.MEDIA_PLAYBACK_RATE_REQUEST,
+        detail: playbackRate,
+      });
+    };
+
+    const resizeObserver = new ResizeObserver(updatePlaybackRate);
+    resizeObserver.observe(videoElement);
+    updatePlaybackRate();
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [dispatch]);
+
   return (
     <video
-      ref={(el) => {
+      ref={React.useCallback((el: HTMLVideoElement | null) => {
         videoRef.current = el;
         mediaRef(el);
-      }}
+      }, [])}
       style={{ width: "100%" }}
       src="https://stream.mux.com/DS00Spx1CV902MCtPj5WknGlR102V5HFkDe/high.mp4"
       preload="auto"
       crossOrigin=""
+      onResize={(event) => {
+        console.log("resizing");
+      }}
     />
   );
 };
 
-const PlayerContainer = ({ children }) => {
+const PlayerContainer = ({ children }: { children: React.ReactNode }) => {
   // "Wire up" the element you want the MediaStore to target for fullscreen using useMediaFullscreenRef()
   const mediaFullscreenRef = useMediaFullscreenRef();
   return <div ref={mediaFullscreenRef}>{children}</div>;
@@ -46,6 +76,7 @@ const PlayButton = () => {
   const mediaPaused = useMediaSelector((state) => state.mediaPaused);
   return (
     <button
+      type="button"
       onClick={() => {
         // Select from a set of well-defined actions for state change requests
         // using MediaActionTypes
@@ -159,7 +190,6 @@ const PlaybackRateController = ({
 
 export const Player = () => {
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const displayCoverage = useDisplayCoverage(containerRef) / 100;
   const {
     isWatching,
     cameraStatus,
@@ -196,7 +226,6 @@ export const Player = () => {
             videoRef={videoRef as React.RefObject<HTMLVideoElement>}
           />
         </div>
-        <PlaybackRateController displayCoverage={displayCoverage} />
       </PlayerContainer>
     </MediaProvider>
   );
