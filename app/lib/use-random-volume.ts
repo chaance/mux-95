@@ -20,6 +20,7 @@ interface UseRandomVolumeOptions {
  */
 export function useRandomVolume(
   videoRef: React.RefObject<HTMLVideoElement | null>,
+  sliderRef: React.RefObject<HTMLInputElement | null>,
   {
     interval = 1000,
     initialVolume = 1,
@@ -32,6 +33,30 @@ export function useRandomVolume(
   React.useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+
+    let isPointerDownOnSlider = false;
+    const abortController = new AbortController();
+    sliderRef.current?.addEventListener(
+      "pointerdown",
+      () => {
+        isPointerDownOnSlider = true;
+      },
+      { signal: abortController.signal },
+    );
+    window.addEventListener(
+      "pointerup",
+      () => {
+        isPointerDownOnSlider = false;
+      },
+      { signal: abortController.signal },
+    );
+    window.addEventListener(
+      "pointercancel",
+      () => {
+        isPointerDownOnSlider = false;
+      },
+      { signal: abortController.signal },
+    );
 
     // Initial setup
     console.log("Initializing random volume control");
@@ -47,25 +72,27 @@ export function useRandomVolume(
 
     // Start new interval
     intervalRef.current = window.setInterval(() => {
+      if (isPointerDownOnSlider) {
+        return;
+      }
+
       const randomVolume = Math.min(Math.max(Math.random(), 0), 1);
       console.log("Setting new volume:", randomVolume);
-
-      if (videoRef.current) {
-        videoRef.current.volume = randomVolume;
-        dispatch({
-          type: MediaActionTypes.MEDIA_VOLUME_REQUEST,
-          detail: randomVolume,
-        });
-      }
+      video.volume = randomVolume;
+      dispatch({
+        type: MediaActionTypes.MEDIA_VOLUME_REQUEST,
+        detail: randomVolume,
+      });
     }, interval);
 
     // Cleanup function
     return () => {
       console.log("Cleaning up random volume control");
+      abortController.abort();
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
     };
-  }, []); // Empty dependency array since we're using refs
+  }, [unmute]); // Empty dependency array since we're using refs
 }

@@ -10,14 +10,19 @@ import * as React from "react";
 import { useFaceLandmarks, CameraDebugPanel } from "../lib/use-face-landmarks";
 import { useRandomVolume } from "../lib/use-random-volume";
 
-const Video = () => {
+const Video = ({
+  ref: videoRef,
+  sliderRef,
+}: {
+  ref: React.RefObject<HTMLVideoElement | null>;
+  sliderRef: React.RefObject<HTMLInputElement | null>;
+}) => {
   // "Wire up" the <video/> element to the MediaStore using useMediaRef()
   const mediaRef = useMediaRef();
-  const videoRef = React.useRef<HTMLVideoElement>(null);
   const dispatch = useMediaDispatch();
 
   // Set up random volume control
-  useRandomVolume(videoRef);
+  useRandomVolume(videoRef, sliderRef);
 
   React.useEffect(() => {
     const videoElement = videoRef.current;
@@ -114,15 +119,32 @@ const FullscreenButton = () => {
   );
 };
 
-const VolumeSlider = () => {
+const VolumeSlider = ({
+  ref,
+}: {
+  ref: React.RefObject<HTMLInputElement | null>;
+}) => {
   const dispatch = useMediaDispatch();
   const volume = useMediaSelector((state) => state.mediaVolume) ?? 1;
   const muted = useMediaSelector((state) => state.mediaMuted);
+
+  const isPointerDown = React.useRef(false);
+  React.useEffect(() => {
+    const handlePointerDown = () => {
+      isPointerDown.current = false;
+      console.log("up");
+    };
+    window.addEventListener("pointerup", handlePointerDown);
+    return () => {
+      window.removeEventListener("pointerup", handlePointerDown);
+    };
+  }, []);
 
   return (
     <div className="flex items-center gap-2">
       <span className="text-sm">Volume:</span>
       <input
+        ref={ref}
         type="range"
         min="0"
         max="1"
@@ -189,7 +211,9 @@ const PlaybackRateController = ({
 };
 
 export const Player = () => {
-  const containerRef = React.useRef<HTMLDivElement>(null);
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const sliderRef = React.useRef<HTMLInputElement | null>(null);
+  const internalVideoRef = React.useRef<HTMLVideoElement | null>(null);
   const {
     isWatching,
     cameraStatus,
@@ -206,12 +230,12 @@ export const Player = () => {
     <MediaProvider>
       <PlayerContainer>
         <div ref={containerRef}>
-          <Video />
+          <Video ref={internalVideoRef} sliderRef={sliderRef} />
         </div>
         <div>
           <PlayButton />
           <FullscreenButton />
-          <VolumeSlider />
+          <VolumeSlider ref={sliderRef} />
         </div>
         <div>
           <CameraDebugPanel
