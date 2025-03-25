@@ -9,6 +9,7 @@ import {
 import * as React from "react";
 import { useFaceLandmarks, CameraDebugPanel } from "../lib/use-face-landmarks";
 import { useRandomVolume } from "../lib/use-random-volume";
+import { Button } from "./button";
 
 const Video = ({
   ref: videoRef,
@@ -80,7 +81,7 @@ const PlayButton = () => {
   // Get the latest media state you care about in your component using useMediaSelector()
   const mediaPaused = useMediaSelector((state) => state.mediaPaused);
   return (
-    <button
+    <Button
       type="button"
       onClick={() => {
         // Select from a set of well-defined actions for state change requests
@@ -92,7 +93,7 @@ const PlayButton = () => {
       }}
     >
       {mediaPaused ? "Play" : "Pause"}
-    </button>
+    </Button>
   );
 };
 
@@ -104,7 +105,7 @@ const FullscreenButton = () => {
     (state) => state.mediaIsFullscreen,
   );
   return (
-    <button
+    <Button
       onClick={() => {
         // Select from a set of well-defined actions for state change requests
         // using MediaActionTypes
@@ -115,7 +116,7 @@ const FullscreenButton = () => {
       }}
     >
       {mediaIsFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-    </button>
+    </Button>
   );
 };
 
@@ -141,29 +142,40 @@ const VolumeSlider = ({
   }, []);
 
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-sm">Volume:</span>
-      <input
-        ref={ref}
-        type="range"
-        min="0"
-        max="1"
-        step="0.1"
-        value={muted ? 0 : volume}
-        onChange={(e) => {
-          const newVolume = parseFloat(e.target.value);
-          dispatch({
-            type: MediaActionTypes.MEDIA_VOLUME_REQUEST,
-            detail: newVolume,
-          });
-          if (muted && newVolume > 0) {
-            dispatch({ type: MediaActionTypes.MEDIA_UNMUTE_REQUEST });
-          }
+    <div
+      className="flex items-center gap-2"
+      style={{ display: "flex", alignItems: "center", gap: "1rem" }}
+    >
+      <div
+        style={{
+          display: "flex",
+          gap: "0.25rem",
         }}
-        className="w-32"
-      />
-      <span className="text-sm">{Math.round((muted ? 0 : volume) * 100)}%</span>
-      <button
+      >
+        <label className="text-sm">
+          Volume: ({Math.round((muted ? 0 : volume) * 100)}%)
+        </label>
+        <input
+          ref={ref}
+          type="range"
+          min="0"
+          max="1"
+          step="0.1"
+          value={muted ? 0 : volume}
+          onChange={(e) => {
+            const newVolume = parseFloat(e.target.value);
+            dispatch({
+              type: MediaActionTypes.MEDIA_VOLUME_REQUEST,
+              detail: newVolume,
+            });
+            if (muted && newVolume > 0) {
+              dispatch({ type: MediaActionTypes.MEDIA_UNMUTE_REQUEST });
+            }
+          }}
+          className="w-32"
+        />
+      </div>
+      <Button
         onClick={() => {
           const randomVolume = Math.random();
           dispatch({
@@ -177,7 +189,7 @@ const VolumeSlider = ({
         className="px-2 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300 transition-colors"
       >
         Random
-      </button>
+      </Button>
     </div>
   );
 };
@@ -232,13 +244,22 @@ export const Player = () => {
         <div ref={containerRef}>
           <Video ref={internalVideoRef} sliderRef={sliderRef} />
         </div>
-        <div>
-          <PlayButton />
-          <FullscreenButton />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
+            marginTop: "1rem",
+          }}
+        >
+          <div style={{ display: "flex", gap: "1rem" }}>
+            <PlayButton />
+            <FullscreenButton />
+          </div>
           <VolumeSlider ref={sliderRef} />
         </div>
         <div>
-          <CameraDebugPanel
+          {/* <CameraDebugPanel
             isWatching={isWatching}
             cameraStatus={cameraStatus}
             lastError={lastError}
@@ -248,7 +269,7 @@ export const Player = () => {
             eyeStatus={eyeStatus}
             attentiveness={attentiveness}
             videoRef={videoRef as React.RefObject<HTMLVideoElement>}
-          />
+          /> */}
         </div>
       </PlayerContainer>
     </MediaProvider>

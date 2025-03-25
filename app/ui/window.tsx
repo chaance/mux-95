@@ -130,7 +130,7 @@ export function Window({
   const { windows, closeWindow, focus } = useWindowState();
   const isOpen = windows.includes(windowId);
   const index = windows.indexOf(windowId);
-  const zIndex = windows.length - index;
+  const zIndex = windows.length + index;
   return (
     <WindowsWindow
       style={{

@@ -16,7 +16,13 @@ export default function Home() {
       <Window title="Videos" windowId="videos" resizable>
         <Videos />
       </Window>
-      <Window title="Media Player" windowId="media-player" resizable>
+      <Window
+        title="Media Player"
+        windowId="media-player"
+        resizable
+        height={400}
+        width={400}
+      >
         <Player />
       </Window>
     </>
