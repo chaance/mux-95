@@ -1,0 +1,48 @@
+.StartMenu {
+  background-color: var(--color-gray-8);
+  border: 2px solid;
+  border-color: var(--color-white) var(--color-gray-6) var(--color-gray-6);
+  padding: 2px;
+  position: relative;
+}
+
+.startButton {
+  background-color: var(--color-gray-8);
+  border: 2px solid;
+  border-color: var(--color-white) var(--color-gray-6) var(--color-gray-6);
+  padding: 2px 8px;
+  color: var(--color-black);
+  text-align: center;
+  user-select: none;
+  display: flex;
+  height: 100%;
+  align-items: center;
+}
+
+.menu {
+  position: absolute;
+  bottom: var(--start-menu-height);
+  left: 0;
+  width: 12rem;
+  background-color: var(--color-gray-8);
+  border: 2px solid;
+  border-color: var(--color-white) var(--color-gray-6) var(--color-gray-6);
+}
+
+.menuInner {
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.menuItem {
+  padding: 0.5rem;
+  background-color: var(--color-gray-8);
+  color: var(--color-black);
+  text-align: center;
+  &:hover {
+    background-color: var(--color-blue-10);
+    color: var(--color-white);
+  }
+}

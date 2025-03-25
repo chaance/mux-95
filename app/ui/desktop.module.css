@@ -1,0 +1,33 @@
+.Desktop {
+  --start-menu-height: 46px;
+  --desktop-item-width: 64px;
+  --_100dvh: 100vh;
+  --_100dvh: 100dvh;
+  --_100vw: 100vw;
+  --_100dvw: 100dvw;
+  display: grid;
+  /* one column, two rows: main and start menu */
+  grid-template:
+    "main" 1fr
+    "start-menu" var(--start-menu-height)
+    / 1fr;
+  height: var(--_100dvh);
+  width: var(--_100dvw);
+  overflow: hidden;
+  background-color: var(--color-teal-9);
+}
+
+.main {
+  grid-area: main;
+}
+
+.icons {
+  display: grid;
+  grid-template-columns: repeat(6, var(--desktop-item-width));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.startMenu {
+  grid-area: start-menu;
+}
