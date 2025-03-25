@@ -10,6 +10,7 @@ import * as React from "react";
 import { useFaceLandmarks, CameraDebugPanel } from "../lib/use-face-landmarks";
 import { useRandomVolume } from "../lib/use-random-volume";
 import { Button } from "./button";
+import MuxVideo from "@mux/mux-video-react";
 
 const Video = ({
   ref: videoRef,
@@ -53,13 +54,14 @@ const Video = ({
   }, [dispatch]);
 
   return (
-    <video
+    <MuxVideo
       ref={React.useCallback((el: HTMLVideoElement | null) => {
         videoRef.current = el;
         mediaRef(el);
       }, [])}
       style={{ width: "100%" }}
-      src="https://stream.mux.com/DS00Spx1CV902MCtPj5WknGlR102V5HFkDe/high.mp4"
+      //   src="https://stream.mux.com/DS00Spx1CV902MCtPj5WknGlR102V5HFkDe/high.mp4"
+      playbackId="xGieV6jvLVB00Z2JldHkdI2wIO02yo7S9a902Q11prb01ws"
       preload="auto"
       crossOrigin=""
       onResize={(event) => {
