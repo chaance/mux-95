@@ -6,6 +6,8 @@ import {
   useMediaFullscreenRef,
   MediaActionTypes,
 } from "media-chrome/react/media-store";
+import * as React from "react";
+import { useDisplayCoverage } from "../lib/use-display-coverage";
 
 const Video = () => {
   // "Wire up" the <video/> element to the MediaStore using useMediaRef()
@@ -72,38 +74,11 @@ const FullscreenButton = () => {
   );
 };
 
-const PlaybackSpeedSlider = () => {
-  const dispatch = useMediaDispatch();
-  const playbackRate = useMediaSelector((state) => state.mediaPlaybackRate);
-  
-  return (
-    <div className="flex items-center gap-2">
-      <span className="text-sm">Speed:</span>
-      <input
-        type="range"
-        min="0.25"
-        max="2"
-        step="0.25"
-        value={playbackRate}
-        onChange={(e) => {
-          const newRate = parseFloat(e.target.value);
-          dispatch({ 
-            type: MediaActionTypes.MEDIA_PLAYBACK_RATE_REQUEST,
-            detail: newRate
-          });
-        }}
-        className="w-32"
-      />
-      <span className="text-sm">{playbackRate}x</span>
-    </div>
-  );
-};
-
 const VolumeSlider = () => {
   const dispatch = useMediaDispatch();
   const volume = useMediaSelector((state) => state.mediaVolume) ?? 1;
   const muted = useMediaSelector((state) => state.mediaMuted);
-  
+
   return (
     <div className="flex items-center gap-2">
       <span className="text-sm">Volume:</span>
@@ -115,9 +90,9 @@ const VolumeSlider = () => {
         value={muted ? 0 : volume}
         onChange={(e) => {
           const newVolume = parseFloat(e.target.value);
-          dispatch({ 
+          dispatch({
             type: MediaActionTypes.MEDIA_VOLUME_REQUEST,
-            detail: newVolume
+            detail: newVolume,
           });
           if (muted && newVolume > 0) {
             dispatch({ type: MediaActionTypes.MEDIA_UNMUTE_REQUEST });
@@ -130,20 +105,44 @@ const VolumeSlider = () => {
   );
 };
 
+const PlaybackRateController = ({ displayCoverage }: { displayCoverage: number }) => {
+  const dispatch = useMediaDispatch();
+  const currentPlaybackRate = useMediaSelector((state) => state.mediaPlaybackRate);
+
+  React.useEffect(() => {
+    // Debounce the playback rate updates
+    const timeoutId = setTimeout(() => {
+      // Clamp the playback rate between 0.5x and 2x
+      const playbackRate = Math.min(Math.max(displayCoverage, 0.5), 2);
+      
+      dispatch({
+        type: MediaActionTypes.MEDIA_PLAYBACK_RATE_REQUEST,
+        detail: playbackRate,
+      });
+    }, 100); // 100ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [displayCoverage, dispatch, currentPlaybackRate]);
+
+  return null;
+};
+
 export const Player = () => {
-  // Get access to Media Chrome's state management in your components using <MediaProvider/>
-  // NOTE: Unlike many other providers (including react-redux's Provider), you'll likely want to keep
-  // your <MediaProvider/> in or close to your <Player/> component)
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const displayCoverage = useDisplayCoverage(containerRef) / 100;
+
   return (
     <MediaProvider>
       <PlayerContainer>
-        <Video />
+        <div ref={containerRef}>
+          <Video />
+        </div>
         <div>
           <PlayButton />
           <FullscreenButton />
-          <PlaybackSpeedSlider />
           <VolumeSlider />
         </div>
+        <PlaybackRateController displayCoverage={displayCoverage} />
       </PlayerContainer>
     </MediaProvider>
   );
