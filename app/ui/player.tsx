@@ -72,6 +72,33 @@ const FullscreenButton = () => {
   );
 };
 
+const PlaybackSpeedSlider = () => {
+  const dispatch = useMediaDispatch();
+  const playbackRate = useMediaSelector((state) => state.mediaPlaybackRate);
+  
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-sm">Speed:</span>
+      <input
+        type="range"
+        min="0.25"
+        max="2"
+        step="0.25"
+        value={playbackRate}
+        onChange={(e) => {
+          const newRate = parseFloat(e.target.value);
+          dispatch({ 
+            type: MediaActionTypes.MEDIA_PLAYBACK_RATE_REQUEST,
+            detail: newRate
+          });
+        }}
+        className="w-32"
+      />
+      <span className="text-sm">{playbackRate}x</span>
+    </div>
+  );
+};
+
 export const Player = () => {
   // Get access to Media Chrome's state management in your components using <MediaProvider/>
   // NOTE: Unlike many other providers (including react-redux's Provider), you'll likely want to keep
@@ -83,6 +110,7 @@ export const Player = () => {
         <div>
           <PlayButton />
           <FullscreenButton />
+          <PlaybackSpeedSlider />
         </div>
       </PlayerContainer>
     </MediaProvider>
