@@ -1,46 +1,56 @@
 "use client";
 import * as React from "react";
-import { WindowContext } from "./window-context";
+import { WindowsContext, type WindowType } from "./window-context";
+
+interface WindowState {
+  windows: WindowType[];
+  focused: string | null;
+}
 
 export function WindowProvider({ children }: { children: React.ReactNode }) {
-  const [{ windows, focused }, setWindowState] = React.useState({
-    windows: [] as string[],
-    focused: null as string | null,
+  const [{ windows, focused }, setWindowState] = React.useState<WindowState>({
+    windows: [],
+    focused: null,
   });
   const openWindow = React.useCallback((id: string, context?: any) => {
     setWindowState((state) => {
-      if (state.windows.includes(id)) {
-        return state;
+      let match = state.windows.find((w) => w.id === id);
+      if (match) {
+        // compare contexts
+        if (Object.is(match.context, context)) {
+          // same context, just re-focus
+          return getFocusAction(id)(state);
+        } else {
+          return {
+            windows: [
+              ...state.windows.filter((w) => w.id !== id),
+              { id, context },
+            ],
+            focused: id,
+          };
+        }
       }
-      return { windows: [...windows, id], focused: id };
+      return { windows: [...state.windows, { id, context }], focused: id };
     });
   }, []);
   const closeWindow = React.useCallback((id: string) => {
     setWindowState((state) => {
-      if (!state.windows.includes(id)) {
+      let match = state.windows.find((w) => w.id === id);
+      if (!match) {
         return state;
       }
-      const windows = state.windows.filter((w) => w !== id);
+
+      const windows = state.windows.filter((w) => w.id !== id);
       const lastOpenWindow = windows[windows.length - 1];
       return {
-        windows: state.windows.filter((w) => w !== id),
+        windows,
         focused:
-          state.focused === id ? (lastOpenWindow ?? null) : state.focused,
+          state.focused === id ? (lastOpenWindow?.id ?? null) : state.focused,
       };
     });
   }, []);
   const focus = React.useCallback((id: string) => {
-    setWindowState((state) => {
-      if (!state.windows.includes(id) || state.focused === id) {
-        return state;
-      }
-
-      // move the window to the end of the array
-      return {
-        windows: state.windows.filter((w) => w !== id).concat(id),
-        focused: id,
-      };
-    });
+    setWindowState(getFocusAction(id));
   }, []);
   const blur = React.useCallback(() => {
     setWindowState((state) => {
@@ -55,10 +65,25 @@ export function WindowProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
   return (
-    <WindowContext
+    <WindowsContext
       value={{ windows, focused, openWindow, closeWindow, blur, focus }}
     >
       {children}
-    </WindowContext>
+    </WindowsContext>
   );
+}
+
+function getFocusAction(id: string) {
+  return function focus(state: WindowState): WindowState {
+    let match = state.windows.find((w) => w.id === id);
+    if (!match || state.focused === id) {
+      return state;
+    }
+
+    // move the window to the end of the array
+    return {
+      windows: state.windows.filter((w) => w.id !== id).concat(match),
+      focused: id,
+    };
+  };
 }

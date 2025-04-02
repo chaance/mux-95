@@ -1,7 +1,12 @@
 import * as React from "react";
 
-type WindowContextValue = {
-  windows: string[];
+export interface WindowType<Ctx = unknown> {
+  id: string;
+  context: Ctx;
+}
+
+type WindowsContextValue = {
+  windows: WindowType[];
   focused: string | null;
   openWindow: (id: string, context?: any) => void;
   closeWindow: (id: string) => void;
@@ -9,6 +14,10 @@ type WindowContextValue = {
   blur: () => void;
 };
 
-const WindowContext = React.createContext<WindowContextValue | null>(null);
+const WindowsContext = React.createContext<WindowsContextValue | null>(null);
+WindowsContext.displayName = "WindowsContext";
+
+const WindowContext = React.createContext<WindowType | null>(null);
 WindowContext.displayName = "WindowContext";
-export { WindowContext };
+
+export { WindowsContext, WindowContext };

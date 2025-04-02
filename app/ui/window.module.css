@@ -15,10 +15,6 @@
   &:where([data-resizable]) {
     resize: both;
   }
-
-  &:where([data-state="closed"]) {
-    display: none;
-  }
 }
 
 .titleBar {

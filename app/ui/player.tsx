@@ -11,6 +11,7 @@ import { useFaceLandmarks, CameraDebugPanel } from "../lib/use-face-landmarks";
 import { useRandomVolume } from "../lib/use-random-volume";
 import { Button } from "./button";
 import MuxVideo from "@mux/mux-video-react";
+import { useWindowContext } from "./use-window-context";
 
 const Video = ({
   ref: videoRef,

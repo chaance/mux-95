@@ -4,10 +4,10 @@ import * as React from "react";
 import { DesktopItem } from "./desktop-item";
 import { StartMenu } from "./start-menu";
 import styles from "./desktop.module.css";
-import { useWindowState } from "./use-window-state";
+import { useWindowsContext } from "./use-window-context";
 
 export function Desktop({ children }: { children: React.ReactNode }) {
-  const { openWindow } = useWindowState();
+  const { openWindow } = useWindowsContext();
   return (
     <div className={styles.Desktop}>
       <div className={styles.main}>

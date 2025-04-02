@@ -13,14 +13,14 @@ export function meta({}: Route.MetaArgs) {
 export default function Home() {
   return (
     <>
-      <Window title="Videos" windowId="videos" resizable>
+      <Window title="Videos" windowId="videos" resizable height={400}>
         <Videos />
       </Window>
       <Window
         title="Media Player"
         windowId="media-player"
         resizable
-        height={400}
+        height={460}
         width={400}
       >
         <Player />

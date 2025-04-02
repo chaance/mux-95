@@ -2,9 +2,10 @@
 import * as React from "react";
 import styles from "./window.module.css";
 import { useDraggable } from "~/lib/use-draggable";
-import { useWindowState } from "./use-window-state";
+import { useWindowsContext } from "./use-window-context";
 import cx from "clsx";
 import { Button, type ButtonProps } from "./button";
+import { type WindowType, WindowContext } from "./window-context";
 
 const WindowsBox: React.FC<WindowsBoxProps> = (props) => {
   let { children, className, inset, depth = 2, ...domProps } = props;
@@ -94,16 +95,7 @@ const WindowsHeaderButton: React.FC<WindowsHeaderButtonProps> = ({
   );
 };
 
-export function Window({
-  title,
-  children,
-  resizable,
-  height = 300,
-  width = 300,
-  positionX = 50,
-  positionY = 50,
-  windowId,
-}: {
+interface WindowProps {
   title: string;
   children: React.ReactNode;
   resizable?: boolean;
@@ -112,14 +104,48 @@ export function Window({
   positionX?: number;
   positionY?: number;
   windowId: string;
-}) {
-  const { position, onDragInit } = useDraggable({ x: positionX, y: positionY });
+}
+
+export function Window(props: WindowProps) {
+  const { windows } = useWindowsContext();
+  const window = windows.find((w) => w.id === props.windowId);
+  if (!window) {
+    return null;
+  }
+
+  return <WindowImpl {...props} window={window} />;
+}
+
+function WindowImpl({
+  title,
+  children,
+  resizable,
+  height = 300,
+  width = 300,
+  positionX,
+  positionY,
+  windowId,
+  window,
+}: WindowProps & { window: WindowType }) {
   const size = { height, width };
-  const { windows, closeWindow, focus } = useWindowState();
-  const isOpen = windows.includes(windowId);
-  const index = windows.indexOf(windowId);
+  const { windows, closeWindow, focus } = useWindowsContext();
+  const openWindowCount = windows.length;
+  let initialX = 50,
+    initialY = 50;
+  if (openWindowCount > 0) {
+    if (positionX === undefined) {
+      initialX += openWindowCount * 20;
+    }
+    if (positionY === undefined) {
+      initialY += openWindowCount * 20;
+    }
+  }
+
+  const { position, onDragInit } = useDraggable({ x: initialX, y: initialY });
+  const index = windows.indexOf(window);
   const zIndex = windows.length + index;
   const windowRef = React.useRef<HTMLDivElement>(null);
+
   return (
     <WindowsWindow
       ref={windowRef}
@@ -134,7 +160,6 @@ export function Window({
       }}
       className={styles.Window}
       data-resizable={resizable || undefined}
-      data-state={isOpen ? "open" : "closed"}
     >
       <WindowsWindowHeader
         className={styles.titleBar}
@@ -152,7 +177,7 @@ export function Window({
       </WindowsWindowHeader>
 
       <WindowsWindowBody>
-        <div>{children}</div>
+        <WindowContext value={window}>{children}</WindowContext>
       </WindowsWindowBody>
     </WindowsWindow>
   );

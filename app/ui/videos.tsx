@@ -12,7 +12,7 @@ import {
 import { useLoaderData, useNavigate, useRouteLoaderData } from "react-router";
 import { ErrorBoundary } from "react-error-boundary";
 import { Button } from "./button";
-import { useWindowState } from "./use-window-state";
+import { useWindowsContext } from "./use-window-context";
 
 interface Video {
   id: string;
@@ -30,11 +30,11 @@ const MUX_UPLOADER_ID = "my-videos-uploader";
 
 function VideosImpl({ onVideoSelect }: VideosProps) {
   const { mux } = useRouteLoaderData<{
-    mux: { id: string; url: string; videos: any };
+    mux: { id: string; url: string; videos: any[] };
   }>("root")!;
   const { videos } = mux;
   const navigate = useNavigate();
-  const { openWindow } = useWindowState();
+  const { openWindow } = useWindowsContext();
 
   return (
     <div>
@@ -74,32 +74,48 @@ function VideosImpl({ onVideoSelect }: VideosProps) {
           </div>
         ) : (
           <div>
-            {videos.map((video) => (
-              <div
-                key={video.id}
-                onClick={() =>
-                  video.status === "ready" &&
-                  openWindow("media-player", { videoId: video.id })
-                }
-              >
-                <div>
-                  {video.status === "uploading" && (
-                    <div style={{ width: `${video.progress}%` }} />
-                  )}
-                  {video.status === "processing" && <p>Processing...</p>}
-                </div>
-                <span>
-                  {video.id?.length > 15
-                    ? video.id.substring(0, 12) + "..."
-                    : video.id}
-                </span>
-                <span>
-                  {video.status === "uploading" && "Uploading..."}
-                  {video.status === "processing" && "Processing..."}
-                  {video.status === "error" && "Error"}
-                </span>
-              </div>
-            ))}
+            {videos.map((video) => {
+              if (video.status === "uploading") {
+                return (
+                  <div
+                    key={video.id}
+                    style={{
+                      width: `${video.progress}%`,
+                      height: "4px",
+                      backgroundColor: "blue",
+                    }}
+                  />
+                );
+              }
+              if (video.status === "error") {
+                return (
+                  <p key={video.id} style={{ color: "red" }}>
+                    Error uploading {video.name}
+                  </p>
+                );
+              }
+
+              return (
+                <button
+                  type="button"
+                  key={video.id}
+                  disabled={video.status !== "ready"}
+                  style={{ display: "flex", gap: "0.5rem" }}
+                  onClick={() => {
+                    if (video.status === "ready") {
+                      openWindow("media-player", { videoId: video.id });
+                    }
+                  }}
+                >
+                  {video.status === "processing" && <span>Processing…</span>}
+                  <span>
+                    {video.id?.length > 15
+                      ? video.id.substring(0, 12) + "..."
+                      : video.id}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         )}
       </MuxUploaderDrop>
