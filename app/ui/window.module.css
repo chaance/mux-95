@@ -10,6 +10,7 @@
   height: var(--window-height);
   min-height: 80px;
   max-width: 100vw;
+  overflow: hidden;
 
   &:where([data-resizable]) {
     resize: both;
@@ -97,6 +98,9 @@
 .WindowsWindowBody {
   padding: var(--spacing-3);
   padding-top: var(--spacing-5);
+  overflow: auto;
+  height: 100%;
+  scrollbar-gutter: stable both-edges;
 }
 
 .WindowsWindowHeader {

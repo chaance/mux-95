@@ -113,26 +113,16 @@ export function Window({
   positionY?: number;
   windowId: string;
 }) {
-  const [sizeState, setSize] = React.useState({ height, width });
-  const {
-    position,
-    handleMouseDown,
-    // handleMouseMove,
-    // handleMouseUp,
-    isDragging,
-  } = useDraggable({ x: positionX, y: positionY });
-  const size = resizable ? sizeState : { height, width };
-  React.useEffect(() => {
-    if (!isDragging) {
-      return;
-    }
-  }, []);
+  const { position, onDragInit } = useDraggable({ x: positionX, y: positionY });
+  const size = { height, width };
   const { windows, closeWindow, focus } = useWindowState();
   const isOpen = windows.includes(windowId);
   const index = windows.indexOf(windowId);
   const zIndex = windows.length + index;
+  const windowRef = React.useRef<HTMLDivElement>(null);
   return (
     <WindowsWindow
+      ref={windowRef}
       style={{
         // @ts-expect-error
         "--window-height": `${size.height}px`,
@@ -148,9 +138,9 @@ export function Window({
     >
       <WindowsWindowHeader
         className={styles.titleBar}
-        onMouseDown={(event) => {
+        onPointerDown={(event) => {
           focus(windowId);
-          handleMouseDown(event);
+          onDragInit(event, windowRef.current);
         }}
       >
         <h2>{title}</h2>

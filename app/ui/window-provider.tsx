@@ -15,7 +15,6 @@ export function WindowProvider({ children }: { children: React.ReactNode }) {
       return { windows: [...windows, id], focused: id };
     });
   }, []);
-  console.log(windows);
   const closeWindow = React.useCallback((id: string) => {
     setWindowState((state) => {
       if (!state.windows.includes(id)) {

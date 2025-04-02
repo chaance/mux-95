@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useDraggable } from "~/lib/use-draggable";
 import {
   default as MuxUploader,
   MuxUploaderDrop,
@@ -33,7 +32,6 @@ function VideosImpl({ onVideoSelect }: VideosProps) {
   const { mux } = useRouteLoaderData<{
     mux: { id: string; url: string; videos: any };
   }>("root")!;
-  console.log(mux);
   const { videos } = mux;
   const navigate = useNavigate();
   const { openWindow } = useWindowState();
