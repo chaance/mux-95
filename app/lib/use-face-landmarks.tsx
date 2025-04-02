@@ -271,6 +271,9 @@ export const CameraDebugPanel: React.FC<CameraDebugPanelProps> = ({
         border: "1px solid #ccc",
         borderRadius: "4px",
         zIndex: 1000,
+        // temp hide
+        opacity: 0,
+        pointerEvents: "none",
       }}
     >
       <h3>Camera Debug Panel</h3>
