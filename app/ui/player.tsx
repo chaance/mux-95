@@ -64,9 +64,6 @@ const Video = ({
       playbackId="xGieV6jvLVB00Z2JldHkdI2wIO02yo7S9a902Q11prb01ws"
       preload="auto"
       crossOrigin=""
-      onResize={(event) => {
-        console.log("resizing");
-      }}
     />
   );
 };
@@ -135,7 +132,6 @@ const VolumeSlider = ({
   React.useEffect(() => {
     const handlePointerDown = () => {
       isPointerDown.current = false;
-      console.log("up");
     };
     window.addEventListener("pointerup", handlePointerDown);
     return () => {
